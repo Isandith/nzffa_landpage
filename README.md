@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Farm Forestry New Zealand — Homepage Prototype
 
-## Getting Started
+A production-quality prototype of the [New Zealand Farm Forestry Association](https://www.nzffa.org.nz/)
+homepage, built with the App Router, TypeScript and Tailwind CSS.
 
-First, run the development server:
+## Getting started
+
+The project is already scaffolded. Install dependencies and run the dev server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To produce an optimized production build and run it:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+> If you were starting from scratch, the equivalent scaffold is:
+> `npx create-next-app@latest nzffa_landpage --ts --app --tailwind --eslint`
 
-To learn more about Next.js, take a look at the following resources:
+## Stack notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Next.js 16** (App Router, Turbopack) + **React 19** + **TypeScript**.
+- **Tailwind CSS v4** — configured CSS-first. There is intentionally **no
+  `tailwind.config.ts`**: in v4 the design tokens are declared once in the
+  `@theme` block of [`app/globals.css`](app/globals.css) and become the single
+  source of truth, generating first-class utilities (`bg-forest-700`,
+  `text-display`, `py-section`, `shadow-md`, …). `content` scanning is
+  automatic in v4, so no paths config is needed.
+- Remote images are allowed via `images.remotePatterns` in
+  [`next.config.ts`](next.config.ts) (scoped to `nzffa.org.nz` asset paths).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Fonts
 
-## Deploy on Vercel
+Loaded via `next/font/google` and wired to the `--font-serif` / `--font-sans`
+theme tokens:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Fraunces** (display/headings) — a warm, high-contrast serif. Its rural,
+  established, slightly editorial character suits a 1957-founded forestry
+  association and gives the headings a premium, hand-considered feel.
+- **Plus Jakarta Sans** (body/UI) — a clean, friendly geometric grotesque that
+  stays highly legible at small sizes and pairs calmly with the serif without
+  competing with it.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Both are variable fonts, so the full weight range is available with no extra
+network cost.
+
+## Structure
+
+```
+app/
+  layout.tsx          # fonts, metadata, html/body shell, header + footer
+  page.tsx            # homepage — composes the sections only
+  globals.css         # Tailwind import + @theme design tokens + base layer
+  [slug]/page.tsx     # on-brand placeholder for every nav/utility route
+components/            # Header, MobileMenu, Hero, FeatureGrid, etc.
+lib/nav.ts            # navigation config (declared once, reused everywhere)
+```
+
+All visible copy and imagery originate from the official NZFFA site.

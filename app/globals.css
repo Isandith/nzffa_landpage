@@ -1,26 +1,274 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ------------------------------------------------------------------ */
+/* Design tokens — single source of truth.                            */
+/* Defined once here, exposed to Tailwind via @theme so every value   */
+/* below becomes a first-class utility (bg-forest-700, text-ink,      */
+/* rounded-md, shadow-md, font-serif, p-section, text-display, ...).  */
+/* No raw hex or arbitrary values are used anywhere in components.     */
+/* ------------------------------------------------------------------ */
+
+@theme {
+  /* Brand greens */
+  --color-forest-950: #050b09; /* near-black green - footer base */
+  --color-forest-900: #14342b; /* deepest green - footers, hero base */
+  --color-forest-800: #1b3a2b; /* primary deep green - headings, header */
+  --color-forest-700: #2d5a40; /* primary green - buttons, links */
+  --color-forest-600: #3c6e4f; /* primary hover */
+  --color-forest-500: #4a7c59; /* medium green - secondary */
+  --color-sage-400: #8ba888; /* soft sage - subtle accents, icons */
+  --color-sage-200: #d6e0d2; /* faint green tint - hover surfaces */
+
+  /* Warm neutrals */
+  --color-cream: #faf7ef; /* page background */
+  --color-cream-200: #f2ecdd; /* alt section background */
+  --color-surface: #ffffff; /* cards */
+  --color-border: #e6e0d2; /* soft borders */
+
+  /* Warm accent — NZFFA orange (restrained, used sparingly) */
+  --color-accent-600: #d9741a; /* core brand orange */
+  --color-accent-500: #e8821e; /* brighter orange */
+
+  /* Text */
+  --color-ink: #1f2421; /* primary charcoal text (never pure black) */
+  --color-ink-soft: #4a4f49; /* secondary text */
+  --color-on-dark: #f5f2ea; /* text on green/photo backgrounds */
+
+  /* Typography — wired to next/font instances in layout.tsx */
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+
+  /* Fluid type scale */
+  --text-display: clamp(2.5rem, 5vw, 4rem);
+  --text-display--line-height: 1.08;
+  --text-h2: clamp(2rem, 3.5vw, 2.75rem);
+  --text-h2--line-height: 1.15;
+  --text-h3: clamp(1.35rem, 2vw, 1.6rem);
+  --text-h3--line-height: 1.25;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+  --text-lead: 1.125rem;
+  --text-lead--line-height: 1.6;
+  --text-meta: 0.9rem;
+  --text-meta--line-height: 1.5;
+
+  /* Named spacing rhythm */
+  --spacing-section: clamp(4rem, 8vw, 6rem);
+  --spacing-gutter: 1.5rem;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  /* Shadows — soft, layered */
+  --shadow-sm: 0 1px 2px rgba(20, 52, 43, 0.05);
+  --shadow-md: 0 6px 16px rgba(20, 52, 43, 0.08);
+  --shadow-lg: 0 16px 40px rgba(20, 52, 43, 0.12);
+
+  /* Text shadow for legibility of light nav text over photography */
+  --text-shadow-hero: 0 1px 8px rgba(20, 52, 43, 0.55);
+
+  /* Content width + named easing */
+  --max-width-content: 1200px;
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Carousel active-dot progress fill (matches the 6s slide interval) */
+  --animate-progress: progress 6s linear;
+
+  /* Structural sizes (viewport-relative layout constraints) */
+  --height-hero: 86vh;
+  --height-page: 50vh;
+  --width-drawer: min(20rem, 85vw);
+
+  /* Aspect ratios */
+  --aspect-card: 4 / 3;
+
+  /* Hero carousel card height */
+  --height-hero-card: clamp(26rem, 60vh, 38rem);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ------------------------------------------------------------------ */
+/* Base layer                                                          */
+/* ------------------------------------------------------------------ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Themed scrollbar (Firefox) — forest thumb on cream track */
+    scrollbar-color: var(--color-forest-600) var(--color-cream-200);
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Themed scrollbar (Chromium / WebKit) */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream-200);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      var(--color-forest-700),
+      var(--color-forest-500)
+    );
+    border: 3px solid var(--color-cream-200);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      var(--color-forest-600),
+      var(--color-accent-600)
+    );
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    text-wrap: balance;
+    color: var(--color-forest-800);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Consistent, visible focus across the whole app */
+  :focus-visible {
+    outline: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Reusable component recipes (@apply kept minimal & readable)         */
+/* ------------------------------------------------------------------ */
+
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(1.75rem);
+    transition:
+      opacity 0.7s var(--ease-smooth),
+      transform 0.7s var(--ease-smooth);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Staggered children: each direct child fades up slightly after the last,
+     creating a cascade when a grid/list enters the viewport. */
+  .reveal-stagger.is-visible > * {
+    animation: reveal-up 0.6s var(--ease-smooth) backwards;
+  }
+
+  .reveal-stagger.is-visible > *:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .reveal-stagger.is-visible > *:nth-child(2) {
+    animation-delay: 0.13s;
+  }
+  .reveal-stagger.is-visible > *:nth-child(3) {
+    animation-delay: 0.21s;
+  }
+  .reveal-stagger.is-visible > *:nth-child(4) {
+    animation-delay: 0.29s;
+  }
+  .reveal-stagger.is-visible > *:nth-child(5) {
+    animation-delay: 0.37s;
+  }
+  .reveal-stagger.is-visible > *:nth-child(6) {
+    animation-delay: 0.45s;
+  }
+
+  /* Floating nature layer: tiny greenish leaves / trees / flowers that
+     drift gently upward, fading in and out on a loop. Purely decorative. */
+  .nature-field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .nature-item {
+    position: absolute;
+    bottom: -3rem;
+    color: var(--color-sage-400);
+    opacity: 0;
+    animation: float-up var(--float-duration, 16s) ease-in-out
+      var(--float-delay, 0s) infinite;
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg) scale(0.9);
+  }
+  15% {
+    opacity: var(--float-opacity, 0.5);
+  }
+  85% {
+    opacity: var(--float-opacity, 0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80vh) rotate(24deg) scale(1.05);
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal-stagger.is-visible > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  .nature-item {
+    display: none;
+  }
 }
