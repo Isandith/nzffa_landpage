@@ -10,8 +10,8 @@ export const primaryNav: NavItem[] = [
   { label: "About", href: "/about" },
   { label: "Membership", href: "/membership" },
   { label: "Events", href: "/events" },
-  { label: "Growing Trees", href: "/growing-trees" },
-  { label: "Species selection tool", href: "/species-selection-tool" },
+  { label: "Library", href: "/library" },
+  { label: "Tools", href: "/tools" },
 ];
 
 export const utilityNav: NavItem[] = [

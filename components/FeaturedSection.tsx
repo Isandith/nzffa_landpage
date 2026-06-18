@@ -50,7 +50,7 @@ export default function FeaturedSection() {
               </p>
             </div>
             <div className="mt-8">
-              <Button href="/growing-trees" variant="secondary" size="lg">
+              <Button href="/library" variant="secondary" size="lg">
                 Discover growing trees
               </Button>
             </div>

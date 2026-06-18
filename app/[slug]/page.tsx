@@ -7,7 +7,7 @@ type PageProps = {
 };
 
 // Turn a URL slug into a readable title, e.g.
-// "species-selection-tool" -> "Species Selection Tool".
+// "member-portal" -> "Member Portal".
 function formatTitle(slug: string): string {
   return slug
     .split("-")

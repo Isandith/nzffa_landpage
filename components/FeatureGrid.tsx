@@ -56,7 +56,7 @@ const features: Feature[] = [
     description:
       "A long-running programme of grower-led research lifting the value and quality of New Zealand specialty timbers.",
     cta: "Learn more",
-    href: "/growing-trees",
+    href: "/library",
     icon: (
       <svg {...iconProps}>
         <circle cx="12" cy="12" r="8.5" />
@@ -70,7 +70,7 @@ const features: Feature[] = [
     description:
       "Match the right tree species to your site, soils and goals with the Association's interactive selection tool.",
     cta: "Open the tool",
-    href: "/species-selection-tool",
+    href: "/tools",
     icon: (
       <svg {...iconProps}>
         <path d="M12 3c2.5 3 4 5 4 7.5A4 4 0 0 1 12 14.5 4 4 0 0 1 8 10.5C8 8 9.5 6 12 3Z" />
