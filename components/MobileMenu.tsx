@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Button from "./Button";
 import { primaryNav, utilityNav, joinLink } from "@/lib/nav";
@@ -10,9 +11,20 @@ type MobileMenuProps = {
   onClose: () => void;
 };
 
+const emptySubscribe = () => () => {};
+
 export default function MobileMenu({ open, onClose }: MobileMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
+
+  // True only after the component has mounted on the client. Server snapshot
+  // is `false`, so SSR and the first client render agree (no hydration
+  // mismatch) before we portal the overlay into <body>.
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   // Close on Escape, lock body scroll, focus-trap inside the panel.
   useEffect(() => {
@@ -54,7 +66,12 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
     };
   }, [open, onClose]);
 
-  return (
+  // Portal to <body> so the fixed overlay escapes the header's stacking /
+  // containing block (the sticky header uses backdrop-blur, which would
+  // otherwise trap and clip this fixed element inside the header).
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className={`fixed inset-0 z-50 lg:hidden ${
         open ? "" : "pointer-events-none"
@@ -135,6 +152,7 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
           {joinLink.label}
         </Button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
