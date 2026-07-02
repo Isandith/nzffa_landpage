@@ -86,6 +86,10 @@
 
   /* Hero carousel card height */
   --height-hero-card: clamp(26rem, 60vh, 38rem);
+
+  /* Real header height, published by Header.tsx via ResizeObserver.
+     The fallback (~112px) matches the two-row desktop header before JS runs. */
+  --header-height: 112px;
 }
 
 @keyframes progress {

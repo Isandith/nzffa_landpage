@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
@@ -13,6 +13,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
 
   // Header is always a solid frosted bar; deepen the shadow once scrolled.
   useEffect(() => {
@@ -24,8 +25,26 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Publish the header's real rendered height as a CSS variable so other
+  // sticky elements (e.g. the library filters sidebar) can dock just below
+  // it instead of guessing a fixed offset that drifts across breakpoints.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const setHeight = () =>
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${el.offsetHeight}px`,
+      );
+    setHeight();
+    const observer = new ResizeObserver(setHeight);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <header
+      ref={headerRef}
       className={`sticky top-0 z-40 border-b border-border bg-cream/85 backdrop-blur-md transition-shadow duration-300 ease-smooth ${
         scrolled ? "shadow-md" : "shadow-sm"
       }`}

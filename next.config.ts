@@ -2,8 +2,20 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Next.js 16 supports the URL-object form of remotePatterns.
-    remotePatterns: [new URL("https://www.nzffa.org.nz/system/assets/**")],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.nzffa.org.nz",
+        pathname: "/system/assets/**",
+      },
+      // Placeholder forestry photography for the Library dummy data, until
+      // the real CMS-served cover images are wired up.
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
   },
 };
 
