@@ -39,6 +39,8 @@ const topicOptions = [
   "Environment & erosion",
 ];
 
+const mediaTypeOptions = ["PDF", "Video", "XLSX"];
+
 // Quick-search suggestions shown under the search bar.
 const popularSearches = ["Radiata pine", "Cypress", "Eucalypts", "ETS", "Natives", "Erosion"];
 
@@ -241,6 +243,54 @@ const resources: Resource[] = [
     topics: ["Environment & erosion", "Tree species"],
     image: "photo-1425913397330-cf8af2ff40a1",
   },
+  {
+    title: "Planting poplars and willows: assessing the site",
+    type: "Videos & webinars",
+    description:
+      "Learn how to assess hill country sites and place poles for best effect to reduce erosion.",
+    source: "Poplar & Willow Research Trust",
+    year: 2016,
+    format: "Video",
+    length: "6 min",
+    topics: ["Environment & erosion", "Establishment"],
+    image: "photo-1516214104703-d870798883c5",
+  },
+  {
+    title: "Planting poplars and willows: choosing the best poles",
+    type: "Videos & webinars",
+    description:
+      "Guidance on choosing the right poplar and willow poles in terms of size and variety for your site.",
+    source: "Poplar & Willow Research Trust",
+    year: 2016,
+    format: "Video",
+    length: "5 min",
+    topics: ["Tree species", "Establishment"],
+    image: "photo-1470019693664-1d202d2c0907",
+  },
+  {
+    title: "Managing poplars and willows: form-pruning poplars",
+    type: "Videos & webinars",
+    description:
+      "Single-stemmed poplars are healthier, allow better pasture growth beneath them and are more likely to produce millable logs.",
+    source: "Poplar & Willow Research Trust",
+    year: 2017,
+    format: "Video",
+    length: "7 min",
+    topics: ["Silviculture & pruning"],
+    image: "photo-1523712999610-f77fbcfc3843",
+  },
+  {
+    title: "New Zealand poplar farm milling",
+    type: "Videos & webinars",
+    description:
+      "A combined video covering milling poplar trees on the farm and what the resulting timber can be used for.",
+    source: "Poplar & Willow Research Trust",
+    year: 2019,
+    format: "Video",
+    length: "34 min",
+    topics: ["Harvest & markets", "Tree species"],
+    image: "photo-1548407260-da850faa41e3",
+  },
 ];
 
 type View = "list" | "grid";
@@ -270,6 +320,7 @@ export default function LibraryBrowser() {
   const [query, setQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<ResourceType[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [selectedMediaTypes, setSelectedMediaTypes] = useState<string[]>([]);
   const [sort, setSort] = useState("Most relevant");
   const [view, setView] = useState<View>("list");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -288,6 +339,15 @@ export default function LibraryBrowser() {
     setVisibleCount(PAGE_SIZE);
   }
 
+  function toggleMediaType(mediaType: string) {
+    setSelectedMediaTypes((prev) =>
+      prev.includes(mediaType)
+        ? prev.filter((t) => t !== mediaType)
+        : [...prev, mediaType],
+    );
+    setVisibleCount(PAGE_SIZE);
+  }
+
   function updateQuery(value: string) {
     setQuery(value);
     setVisibleCount(PAGE_SIZE);
@@ -296,6 +356,7 @@ export default function LibraryBrowser() {
   function resetAll() {
     setSelectedTypes([]);
     setSelectedTopics([]);
+    setSelectedMediaTypes([]);
     setVisibleCount(PAGE_SIZE);
   }
 
@@ -312,7 +373,10 @@ export default function LibraryBrowser() {
       const matchesTopic =
         selectedTopics.length === 0 ||
         r.topics.some((t) => selectedTopics.includes(t));
-      return matchesQuery && matchesType && matchesTopic;
+      const matchesMediaType =
+        selectedMediaTypes.length === 0 ||
+        selectedMediaTypes.includes(r.format);
+      return matchesQuery && matchesType && matchesTopic && matchesMediaType;
     });
 
     if (sort === "Most recent") {
@@ -322,7 +386,7 @@ export default function LibraryBrowser() {
     }
 
     return results;
-  }, [query, selectedTypes, selectedTopics, sort]);
+  }, [query, selectedTypes, selectedTopics, selectedMediaTypes, sort]);
 
   const visible = filtered.slice(0, visibleCount);
 
@@ -342,7 +406,18 @@ export default function LibraryBrowser() {
     return counts;
   }, []);
 
-  const hasFilters = selectedTypes.length > 0 || selectedTopics.length > 0;
+  const mediaTypeCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const mediaType of mediaTypeOptions) {
+      counts.set(mediaType, resources.filter((r) => r.format === mediaType).length);
+    }
+    return counts;
+  }, []);
+
+  const hasFilters =
+    selectedTypes.length > 0 ||
+    selectedTopics.length > 0 ||
+    selectedMediaTypes.length > 0;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[240px_1fr] lg:gap-8">
@@ -409,6 +484,32 @@ export default function LibraryBrowser() {
                     </span>
                     <span className="text-xs text-ink-soft">
                       {topicCounts.get(topic)}
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </fieldset>
+
+          <fieldset className="mt-5 border-t border-border pt-5">
+            <legend className="font-sans text-xs font-semibold uppercase tracking-widest text-ink-soft">
+              Media type
+            </legend>
+            <ul className="mt-3 space-y-0.5">
+              {mediaTypeOptions.map((mediaType) => (
+                <li key={mediaType}>
+                  <label className="group flex cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1.5 text-meta text-ink transition-colors hover:bg-sage-200/50">
+                    <span className="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={selectedMediaTypes.includes(mediaType)}
+                        onChange={() => toggleMediaType(mediaType)}
+                        className="h-4 w-4 rounded border-border text-forest-700 accent-forest-700 focus-visible:ring-2 focus-visible:ring-forest-600"
+                      />
+                      {mediaType}
+                    </span>
+                    <span className="text-xs text-ink-soft">
+                      {mediaTypeCounts.get(mediaType)}
                     </span>
                   </label>
                 </li>
@@ -497,6 +598,13 @@ export default function LibraryBrowser() {
             ))}
             {selectedTopics.map((topic) => (
               <FilterChip key={topic} label={topic} onRemove={() => toggleTopic(topic)} />
+            ))}
+            {selectedMediaTypes.map((mediaType) => (
+              <FilterChip
+                key={mediaType}
+                label={mediaType}
+                onRemove={() => toggleMediaType(mediaType)}
+              />
             ))}
             <button
               type="button"
